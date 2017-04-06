@@ -1,8 +1,12 @@
 p= link_to 'Создать вопрос', new_question_path
 
 - @questions.each_with_index do |question, index|
+  p= "-" * 200
   p= "Вопрос №#{index+1}"
   p= question.ask
+  p= "Правильный ответ: #{question.correct_answer}"
+  p= "Варианты ответов:"
+  p= question.choice
   p= link_to 'Редактировать вопрос', edit_question_path(question)
   p= link_to 'Удалить вопрос', question_path(question),
             data: {confirm: 'Are you sure?'}, method: :delete 

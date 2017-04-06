@@ -7,8 +7,6 @@ class QuestionsController < ApplicationController
 
   def new
     @question = Question.new
-    #@question = User.first.questions.first
-    #@answers = @question.answers
   end
 
   def edit
@@ -46,7 +44,7 @@ class QuestionsController < ApplicationController
   end
 
   def question_params
-    params.require(:question).permit(:examinee_answer, :ask, :correct_answer)
+    params.require(:question).permit(:examinee_answer, :ask, :correct_answer, :choice)
   end
 
   def set_user
