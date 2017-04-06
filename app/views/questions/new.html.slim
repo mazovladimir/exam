@@ -1,0 +1,10 @@
+= form_for (@question) do |f|
+
+  p #{@question.ask}
+
+  - @answers.each do |answer|
+    p
+    = f.radio_button :examinee_answer, answer.give, required: true
+    = f.label :examinee_answer, answer.give
+
+  p= f.submit 'Next Question'
