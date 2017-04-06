@@ -2,17 +2,17 @@
   - if @question.errors.any?
     #error_explanation
       h2
-        = pluralize(@question.errors.count, "error") 
+        = pluralize(@question.errors.count, "error")
       ul
         - @question.errors.full_messages.each do |msg|
-          li #{msg} 
+          li #{msg}
   
   p= f.label :ask, 'Вопрос:'
   p= f.text_area :ask, size: "100x6"
-  
+
   
   p= f.label :correct_answer, 'Правильный ответ:'
-  p= f.text_field :correct_answer, size: "100x1"
+  p= f.text_area :correct_answer, size: "100x1"
 
   p
-  = f.submit 'Создать'
+  = f.submit 'Сохранить'

@@ -18,7 +18,7 @@ class QuestionsController < ApplicationController
     @question = Question.new(question_params)
 
     if @question.save
-      redirect_to @question
+      redirect_to questions_path
     else
       render 'new'
     end
@@ -26,8 +26,12 @@ class QuestionsController < ApplicationController
 
   def update
     #@question.update(score: 'true') if score_answer == @question.answer
-    @question.update(question_params) 
-    @question.update(score: true) if @question.correct_answer == @question.examinee_answer
+    if @question.update(question_params) 
+      redirect_to questions_path
+    else
+      render 'edit'
+    end
+    #@question.update(score: true) if @question.correct_answer == @question.examinee_answer
     #redirect_to action: "new"
   end
 
@@ -42,7 +46,7 @@ class QuestionsController < ApplicationController
   end
 
   def question_params
-    params.require(:question).permit(:examinee_answer, :ask)
+    params.require(:question).permit(:examinee_answer, :ask, :correct_answer)
   end
 
   def set_user
