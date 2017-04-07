@@ -14,8 +14,8 @@
   p= f.label :correct_answer, 'Правильный ответ:'
   p= f.text_area :correct_answer, size: "100x2"
 
-  p= f.label :choice, 'Варианты ответов (разделить ответы через ::)'
-  p= f.text_area :choice, size: "100x4"
+  p= label :choice, 'Варианты ответов (разделить ответы через ::)'
+  p= text_area :choice, params[:choice]
 
   p
   = f.submit 'Создать'

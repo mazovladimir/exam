@@ -14,23 +14,24 @@ class QuestionsController < ApplicationController
 
   def create
     @question = Question.new(question_params)
+    @answer_choice = params[:choice]
 
     if @question.save
+      Question.add_answers(@question, @answer_choice)
       redirect_to questions_path
     else
       render 'new'
     end
+
+    
   end
 
   def update
-    #@question.update(score: 'true') if score_answer == @question.answer
     if @question.update(question_params) 
       redirect_to questions_path
     else
       render 'edit'
     end
-    #@question.update(score: true) if @question.correct_answer == @question.examinee_answer
-    #redirect_to action: "new"
   end
 
   def destroy
