@@ -10,20 +10,20 @@ class QuestionsController < ApplicationController
   end
 
   def edit
+    @answer_choice = "Hello"
   end
 
   def create
     @question = Question.new(question_params)
-    @answer_choice = params[:choice]
+    @choice = params[:choice]
+    @correct_answer = params[:question][:correct_answer]
 
     if @question.save
-      Question.add_answers(@question, @answer_choice)
+      Question.add_answers(@question, @choice, @correct_answer)
       redirect_to questions_path
     else
       render 'new'
     end
-
-    
   end
 
   def update
@@ -35,7 +35,9 @@ class QuestionsController < ApplicationController
   end
 
   def destroy
-    @question.destroy
+    if @question.destroy
+      redirect_to questions_path
+    end
   end
 
   private
@@ -45,7 +47,7 @@ class QuestionsController < ApplicationController
   end
 
   def question_params
-    params.require(:question).permit(:examinee_answer, :ask, :correct_answer, :choice)
+    params.require(:question).permit(:examinee_answer, :ask, :correct_answer)
   end
 
   def set_user
