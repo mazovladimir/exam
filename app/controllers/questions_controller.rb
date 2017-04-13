@@ -29,10 +29,9 @@ class QuestionsController < ApplicationController
     @choice = params[:choice].split("\r\n")
     @correct_answer = params[:question][:correct_answer]
 
-    if check_answers? 
+    if check_answers? && @question.update(question_params)
       ActiveRecord::Base.transaction do     
         @question.answers.destroy_all
-        @question.update(question_params)
         @choice.each { |x| @question.answers.create(give: x) }
       end  
       redirect_to questions_path, notice: "Вопрос был успешно обновлен"

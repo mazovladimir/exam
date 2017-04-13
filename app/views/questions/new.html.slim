@@ -15,7 +15,7 @@
   p= f.text_area :correct_answer, size: "100x2"
 
   p= label :choice, 'Варианты ответов (каждый ответ в новой строке)'
-  p= text_area :choice, params[:choice]
+  p= text_area :choice, params[:choice], size: "100x6"
 
   p
   = f.submit 'Создать'

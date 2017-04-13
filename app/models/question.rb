@@ -1,5 +1,5 @@
 class Question < ApplicationRecord
-  validates :ask, presence: true, length: { maximum: 1000 }
+  validates :ask, :correct_answer, presence: true, length: { maximum: 1000 }
 
   has_many :answers, dependent: :destroy
   has_many :questions_users
