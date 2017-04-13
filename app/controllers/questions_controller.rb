@@ -18,17 +18,19 @@ class QuestionsController < ApplicationController
     @choice = params[:choice]
     @correct_answer = params[:question][:correct_answer]
 
-    if @question.save
-      Question.add_answers(@question, @choice, @correct_answer)
-      redirect_to questions_path
+    if Question.save_new_question(@question, @choice, @correct_answer)
+      redirect_to questions_path, notice: "Вопрос был успешно создан"
     else
-      render 'new'
+      redirect_to questions_path, alert: 'Fields not correct'
     end
   end
 
   def update
-    if @question.update(question_params) 
-      redirect_to questions_path
+    @choice = params[:choice]
+    @correct_answer = params[:question][:correct_answer]
+
+    if Question.update_question(@question, @choice, @correct_answer)
+      redirect_to questions_path, notice: "Вопрос был успешно обновлен"
     else
       render 'edit'
     end

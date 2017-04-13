@@ -14,5 +14,8 @@
   p= f.label :correct_answer, 'Правильный ответ:'
   p= f.text_area :correct_answer, size: "100x2"
 
+  p= label_tag :choice, 'Варианты ответов (каждый ответ в новой строке)'
+  p= text_area_tag :choice, @question.answers.map { |i| i.give + "\n"}.join(""), size: "100x6"
+
   p
-  = f.submit 'Сохранить'
+  = f.submit @question.new_record? ? 'Сохранить' : 'Обновить'
