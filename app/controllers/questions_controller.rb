@@ -14,7 +14,7 @@ class QuestionsController < ApplicationController
 
   def create
     @question = Question.new(question_params)
-    params[:question][:choice].split("\r\n").reject { |c| c.empty? }.map {|x| @question.answers.build(give: x)}
+    split_question_choice.map {|x| @question.answers.build(give: x)}
 
     if @question.save
       redirect_to questions_path, notice: "Вопрос был успешно создан"
@@ -24,10 +24,10 @@ class QuestionsController < ApplicationController
   end
 
   def update
-    if params[:question][:choice].split("\r\n").reject { |c| c.empty? } != @question.answers.map(&:give)
+    if split_question_choice != @question.answers.map(&:give)
       ActiveRecord::Base.transaction do
         @question.answers.destroy_all
-        params[:question][:choice].split("\r\n").reject { |c| c.empty? }.map {|x| @question.answers.build(give: x)}
+        split_question_choice.map {|x| @question.answers.build(give: x)}
       end
     end
 
@@ -45,6 +45,10 @@ class QuestionsController < ApplicationController
   end
 
   private
+
+  def split_question_choice
+    return params[:question][:choice].split("\r\n").reject { |c| c.empty? }
+  end
 
   def set_question
     @question = Question.find(params[:id])
