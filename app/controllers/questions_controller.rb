@@ -14,29 +14,26 @@ class QuestionsController < ApplicationController
 
   def create
     @question = Question.new(question_params)
-    @choice = params[:choice].first.split("\r\n")
-    @correct_answer = params[:question][:correct_answer]
-    @choice.each { |x| @question.answers.build(give: x) }
+    params[:question][:choice].split("\r\n").reject { |c| c.empty? }.map {|x| @question.answers.build(give: x)}
 
-    if check_answers? && @question.save
+    if @question.save
       redirect_to questions_path, notice: "Вопрос был успешно создан"
     else
-      redirect_to questions_path, alert: "Failed"
+      render 'new'
     end
   end
 
   def update
-    #@choice = params[:choice].split("\r\n")
-    @correct_answer = params[:question][:correct_answer]
+    if params[:question][:choice].split("\r\n").reject { |c| c.empty? } != @question.answers.map(&:give)
+      ActiveRecord::Base.transaction do
+        @question.answers.destroy_all
+        params[:question][:choice].split("\r\n").reject { |c| c.empty? }.map {|x| @question.answers.build(give: x)}
+      end
+    end
 
     if @question.update(question_params)
-      ActiveRecord::Base.transaction do     
-        @question.answers.destroy_all
-        @choice.each { |x| @question.answers.create(give: x) }
-      end  
       redirect_to questions_path, notice: "Вопрос был успешно обновлен"
     else
-      #flash[:error] = @question.errors
       render 'edit'
     end
   end
@@ -55,10 +52,6 @@ class QuestionsController < ApplicationController
 
   def question_params
     params.require(:question).permit(:examinee_answer, :ask, :correct_answer, :choice)
-  end
-
-  def check_answers?
-    (@choice.uniq.size == @choice.size)
   end
 
   def set_user
