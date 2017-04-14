@@ -21,21 +21,22 @@ class QuestionsController < ApplicationController
     if check_answers? && @question.save
       redirect_to questions_path, notice: "Вопрос был успешно создан"
     else
-      redirect_to questions_path, alert: 'Fields not correct'
+      redirect_to questions_path, alert: "Failed"
     end
   end
 
   def update
-    @choice = params[:choice].split("\r\n")
+    #@choice = params[:choice].split("\r\n")
     @correct_answer = params[:question][:correct_answer]
 
-    if check_answers? && @question.update(question_params)
+    if @question.update(question_params)
       ActiveRecord::Base.transaction do     
         @question.answers.destroy_all
         @choice.each { |x| @question.answers.create(give: x) }
       end  
       redirect_to questions_path, notice: "Вопрос был успешно обновлен"
     else
+      #flash[:error] = @question.errors
       render 'edit'
     end
   end
@@ -53,11 +54,11 @@ class QuestionsController < ApplicationController
   end
 
   def question_params
-    params.require(:question).permit(:examinee_answer, :ask, :correct_answer)
+    params.require(:question).permit(:examinee_answer, :ask, :correct_answer, :choice)
   end
 
   def check_answers?
-    @choice.include?(@correct_answer) && (@choice.size > 1) && (@choice.uniq.size == @choice.size)
+    (@choice.uniq.size == @choice.size)
   end
 
   def set_user

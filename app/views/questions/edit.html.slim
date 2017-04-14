@@ -2,7 +2,7 @@
   - if @question.errors.any?
     #error_explanation
       h2
-        = pluralize(@question.errors.count, "error")
+        = "Обнаружены ошибки"
       ul
         - @question.errors.full_messages.each do |msg|
           li #{msg}
@@ -14,8 +14,8 @@
   p= f.label :correct_answer, 'Правильный ответ:'
   p= f.text_area :correct_answer, size: "100x2"
 
-  p= label_tag :choice, 'Варианты ответов (каждый ответ в новой строке)'
-  p= text_area_tag :choice, @question.answers.map { |i| i.give + "\n"}.join(""), size: "100x6"
+  p= f.label :choice, 'Варианты ответов (каждый ответ в новой строке)'
+  p= f.text_area :choice, value: @question.answers.map(&:give).join("\n"), size: "100x6"
 
   p
   = f.submit @question.new_record? ? 'Сохранить' : 'Обновить'
