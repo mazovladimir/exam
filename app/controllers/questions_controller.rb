@@ -14,7 +14,7 @@ class QuestionsController < ApplicationController
 
   def create
     @question = Question.new(question_params)
-    split_question_choice.map {|x| @question.answers.build(give: x)}
+    params_question_choice.map {|x| @question.answers.build(give: x)}
 
     if @question.save
       redirect_to questions_path, notice: "Вопрос был успешно создан"
@@ -24,10 +24,10 @@ class QuestionsController < ApplicationController
   end
 
   def update
-    if split_question_choice != @question.answers.map(&:give)
+    if params_question_choice != @question.answers.map(&:give)
       ActiveRecord::Base.transaction do
         @question.answers.destroy_all
-        split_question_choice.map {|x| @question.answers.build(give: x)}
+        params_question_choice.map {|x| @question.answers.build(give: x)}
       end
     end
 
@@ -46,8 +46,8 @@ class QuestionsController < ApplicationController
 
   private
 
-  def split_question_choice
-    return params[:question][:choice].split("\r\n").reject { |c| c.empty? }
+  def params_question_choice
+    params[:question][:choice].split("\r\n")
   end
 
   def set_question
@@ -55,7 +55,7 @@ class QuestionsController < ApplicationController
   end
 
   def question_params
-    params.require(:question).permit(:examinee_answer, :ask, :correct_answer, :choice)
+    params.require(:question).permit(:ask, :correct_answer, :choice)
   end
 
   def set_user
