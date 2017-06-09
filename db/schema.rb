@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170406094926) do
+ActiveRecord::Schema.define(version: 20170608053514) do
 
   create_table "answers", force: :cascade do |t|
     t.datetime "created_at",  null: false
@@ -46,6 +46,7 @@ ActiveRecord::Schema.define(version: 20170406094926) do
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
     t.string   "examinee_answer"
+    t.integer  "examinee_score"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

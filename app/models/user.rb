@@ -5,4 +5,8 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
+
+  def self.generate_questions
+    self.find(1).questions = Question.all.sample(3)
+  end
 end

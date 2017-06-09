@@ -3,6 +3,7 @@ class QuestionsController < ApplicationController
 
   def index
     @questions = Question.all
+    @user = current_user
   end
 
   def new
@@ -47,7 +48,7 @@ class QuestionsController < ApplicationController
   private
 
   def params_question_choice
-    params[:question][:choice].split("\r\n")
+    params[:question][:choice].split("\r\n").reject { |x| x.empty? }
   end
 
   def set_question
