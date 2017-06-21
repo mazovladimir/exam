@@ -35,6 +35,8 @@ class Question < ApplicationRecord
       question.answers.destroy_all unless choice == question.answers.map(&:give)
       choice.map {|x| question.answers.build(give: x)} if question.answers.empty?
       correct.map {|p| question.correct_answers.build(give: p)} if question.correct_answers.empty?
+      question.update(multiple_answers: true) if question.correct_answers.size > 1
+      question.update(multiple_answers: false) if question.correct_answers.size == 1
       question.save!
     end
     rescue ActiveRecord::RecordInvalid 
