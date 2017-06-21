@@ -1,0 +1,7 @@
+- if @question.errors.any?
+    #error_explanation
+      h2
+        = "Обнаружены ошибки"
+      ul
+        - @question.errors.full_messages.each do |msg|
+          li #{msg}

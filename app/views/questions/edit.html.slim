@@ -1,11 +1,5 @@
 = form_for @question do |f|
-  - if @question.errors.any?
-    #error_explanation
-      h2
-        = "Обнаружены ошибки"
-      ul
-        - @question.errors.full_messages.each do |msg|
-          li #{msg}
+  = render "errors"
   
   p= f.label :ask, 'Вопрос:'
   p= f.text_area :ask, size: "100x6"
