@@ -6,8 +6,10 @@ p= link_to 'Начать экзамен', user_questions_path(user_id: @user.id)
   p.question= "Вопрос №#{index+1}"
   p.description= question.ask
   b= "Правильный ответ:" 
-  ul
-    li #{question.correct_answer}
+  - if ! question.nil?
+    - question.correct_answers.each do |correct_answer|
+      ul
+        li #{correct_answer.give}
   b= "Варианты ответов:"
   - question.answers.each do |qa|
     ul

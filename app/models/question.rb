@@ -1,11 +1,8 @@
 class Question < ApplicationRecord
+  attr_accessor :correct
   attr_accessor :choice
 
   validate :validate_question, :validate_correct_answer, :validate_choice
-
-  has_many :answers, dependent: :destroy
-  has_many :questions_users
-  has_many :users, through: :questions_users
 
   def validate_question
     self.errors.add(:base, "Пожалуйста, введите вопрос не меньше 10 символов") if self.ask.length < 10
@@ -13,23 +10,39 @@ class Question < ApplicationRecord
   end
 
   def validate_correct_answer
-    self.errors.add(:base, "Напишите правильный ответ без перевода новой строки") if self.correct_answer.scan(/$|\Z/).count != 1
-    self.errors.add(:base, "Поле 'Правильный ответ' не может быть пустым") if split_correct_answer.empty?
+    self.errors.add(:base, "Поле 'Правильный ответ' не может быть пустым") if self.correct_answers.size < 1
+    self.errors.add(:base, "Пожалуйста, введите правильный ответ не больше 1000 символов") if self.correct_answers.length > 1000
+    self.errors.add(:base, "Не все правильные ответы входят в список вариантов ответа") if (self.correct_answers.map(&:give) - self.answers.map(&:give)).any?
+    self.errors.add(:base, "Правильные ответы совпадают, удалите дубликаты") if self.correct_answers.map(&:give).uniq.size != self.correct_answers.map(&:give).size
   end
 
   def validate_choice
-    self.errors.add(:base, "Вариантов ответа должно быть больше одного") if split_choice.size < 2
-    self.errors.add(:base, "Правильный ответ не входит в список вариантов ответов") if ! split_choice.include?(split_correct_answer.first)
-    self.errors.add(:base, "Варианты ответа совпадают, удалите дубликаты") if split_choice.uniq.size != split_choice.size
-    self.errors.add(:base, "Удалите пустые строки в вариантах ответа") if self.choice.scan(/$|\Z/).count != split_choice.size
+    self.errors.add(:base, "Вариантов ответа должно быть больше одного") if self.answers.size < 2
+    self.errors.add(:base, "Варианты ответа совпадают, удалите дубликаты") if self.answers.map(&:give).uniq.size != self.answers.map(&:give).size
   end
 
-  def split_choice
-    return self.choice.split("\r\n")
+  after_create :set_multiple_answers
+
+  has_many :answers, dependent: :destroy
+  has_many :questions_users
+  has_many :users, through: :questions_users
+  has_many :correct_answers, dependent: :destroy
+  
+  
+  def self.update_answer(question,correct,choice)
+    Question.transaction do
+      question.correct_answers.destroy_all
+      question.answers.destroy_all
+      choice.map {|x| question.answers.build(give: x)}
+      correct.map {|p| question.correct_answers.build(give: p)}
+      question.save!
+    end
+    rescue ActiveRecord::RecordInvalid 
   end
 
-  def split_correct_answer
-    return self.correct_answer.split("\r\n")
-  end
+  private
 
+  def set_multiple_answers
+    self.update(multiple_answers: true) if self.correct_answers.size > 1
+  end
 end

@@ -11,8 +11,8 @@
   p= f.text_area :ask, size: "100x6"
   
   
-  p= f.label :correct_answer, 'Правильный ответ:'
-  p= f.text_area :correct_answer, size: "100x2"
+  p= f.label :correct, 'Правильный ответ (если указано больше одного правильного ответа, будет сформирован вопрос с несколькими вариантами ответов):'
+  p= f.text_area :correct, size: "100x2"
 
   p= f.label :choice, 'Варианты ответов (каждый ответ в новой строке)'
   p= f.text_area :choice, size: "100x6"

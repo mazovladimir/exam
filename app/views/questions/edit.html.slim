@@ -10,9 +10,8 @@
   p= f.label :ask, 'Вопрос:'
   p= f.text_area :ask, size: "100x6"
 
-  
-  p= f.label :correct_answer, 'Правильный ответ:'
-  p= f.text_area :correct_answer, size: "100x2"
+  p= f.label :correct, 'Правильный ответ:'
+  p= f.text_area :correct, value: @question.correct_answers.map(&:give).join("\n"), size: "100x2"
 
   p= f.label :choice, 'Варианты ответов (каждый ответ в новой строке)'
   p= f.text_area :choice, value: @question.answers.map(&:give).join("\n"), size: "100x6"

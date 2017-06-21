@@ -16,6 +16,7 @@ class QuestionsController < ApplicationController
   def create
     @question = Question.new(question_params)
     params_question_choice.map {|x| @question.answers.build(give: x)}
+    params_correct_answer.map {|p| @question.correct_answers.build(give: p)}
 
     if @question.save
       redirect_to questions_path, notice: "Вопрос был успешно создан"
@@ -25,14 +26,7 @@ class QuestionsController < ApplicationController
   end
 
   def update
-    if params_question_choice != @question.answers.map(&:give)
-      ActiveRecord::Base.transaction do
-        @question.answers.destroy_all
-        params_question_choice.map {|x| @question.answers.build(give: x)}
-      end
-    end
-
-    if @question.update(question_params)
+    if Question.update_answer(@question, params_correct_answer, params_question_choice)  
       redirect_to questions_path, notice: "Вопрос был успешно обновлен"
     else
       render 'edit'
@@ -48,7 +42,11 @@ class QuestionsController < ApplicationController
   private
 
   def params_question_choice
-    params[:question][:choice].split("\r\n").reject { |x| x.empty? }
+    params[:question][:choice].split("\r\n").map(&:strip).reject(&:empty?)
+  end
+
+  def params_correct_answer
+    params[:question][:correct].split("\r\n").map(&:strip).reject(&:empty?)
   end
 
   def set_question
@@ -56,7 +54,7 @@ class QuestionsController < ApplicationController
   end
 
   def question_params
-    params.require(:question).permit(:ask, :correct_answer, :choice)
+    params.require(:question).permit(:ask, :correct, :choice)
   end
 
   def set_user

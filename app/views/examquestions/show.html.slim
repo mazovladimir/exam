@@ -1,8 +1,4 @@
-= form_for :user, method: :get, html: { class: "main-window" } do |f|
-  p= @examquestion.ask
-  - @examquestion.answers.each do |answer|
-    li= answer.give
-
-  p
-  = link_to 'Предыдущий вопрос', user_prev_question_path(id: @examquestion.id), method: :get
-  = link_to 'Следующий вопрос', user_next_question_path(id: @examquestion.id), method: :get
+= render "form.html.slim"
+p
+= link_to 'Предыдущий вопрос', user_prev_question_path(id: @examquestion.id), method: :get, remote: true
+= link_to 'Следующий вопрос', user_next_question_path(id: @examquestion.id), method: :get, remote: true
