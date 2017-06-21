@@ -31,10 +31,10 @@ class Question < ApplicationRecord
   
   def self.update_answer(question,correct,choice)
     Question.transaction do
-      question.correct_answers.destroy_all
-      question.answers.destroy_all
-      choice.map {|x| question.answers.build(give: x)}
-      correct.map {|p| question.correct_answers.build(give: p)}
+      question.correct_answers.destroy_all unless correct == question.correct_answers.map(&:give)
+      question.answers.destroy_all unless choice == question.answers.map(&:give)
+      choice.map {|x| question.answers.build(give: x)} if question.answers.empty?
+      correct.map {|p| question.correct_answers.build(give: p)} if question.correct_answers.empty?
       question.save!
     end
     rescue ActiveRecord::RecordInvalid 
