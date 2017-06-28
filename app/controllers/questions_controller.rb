@@ -15,8 +15,8 @@ class QuestionsController < ApplicationController
 
   def create
     @question = Question.new(question_params)
-    params_question_choice.map {|x| @question.answers.build(give: x)}
-    params_correct_answer.map {|p| @question.correct_answers.build(give: p)}
+    @question.params_question_choice(question_params)
+    @question.params_correct_answer(question_params)
 
     if @question.save
       redirect_to questions_path, notice: "Вопрос был успешно создан"
@@ -26,7 +26,7 @@ class QuestionsController < ApplicationController
   end
 
   def update
-    if Question.update_answer(@question, params_correct_answer, params_question_choice)  
+    if @question.update_transaction?(question_params)
       redirect_to questions_path, notice: "Вопрос был успешно обновлен"
     else
       render 'edit'
@@ -40,14 +40,6 @@ class QuestionsController < ApplicationController
   end
 
   private
-
-  def params_question_choice
-    params[:question][:choice].split("\r\n").map(&:strip).reject(&:empty?)
-  end
-
-  def params_correct_answer
-    params[:question][:correct].split("\r\n").map(&:strip).reject(&:empty?)
-  end
 
   def set_question
     @question = Question.find(params[:id])

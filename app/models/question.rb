@@ -5,13 +5,12 @@ class Question < ApplicationRecord
   validate :validate_question, :validate_correct_answer, :validate_choice
 
   def validate_question
-    self.errors.add(:base, "Пожалуйста, введите вопрос не меньше 10 символов") if self.ask.length < 10
+    self.errors.add(:base, "Пожалуйста, введите вопрос не меньше 1 символа") if self.ask.length < 1
     self.errors.add(:base, "Пожалуйста, введите вопрос не больше 1000 символов") if self.ask.length > 1000
   end
 
   def validate_correct_answer
     self.errors.add(:base, "Поле 'Правильный ответ' не может быть пустым") if self.correct_answers.size < 1
-    self.errors.add(:base, "Пожалуйста, введите правильный ответ не больше 1000 символов") if self.correct_answers.length > 1000
     self.errors.add(:base, "Не все правильные ответы входят в список вариантов ответа") if (self.correct_answers.map(&:give) - self.answers.map(&:give)).any?
     self.errors.add(:base, "Правильные ответы совпадают, удалите дубликаты") if self.correct_answers.map(&:give).uniq.size != self.correct_answers.map(&:give).size
   end
@@ -21,30 +20,34 @@ class Question < ApplicationRecord
     self.errors.add(:base, "Варианты ответа совпадают, удалите дубликаты") if self.answers.map(&:give).uniq.size != self.answers.map(&:give).size
   end
 
-  after_create :set_multiple_answers
+  before_save :set_multiple_answers
 
   has_many :answers, dependent: :destroy
   has_many :questions_users
   has_many :users, through: :questions_users
   has_many :correct_answers, dependent: :destroy
-  
-  
-  def self.update_answer(question,correct,choice)
-    Question.transaction do
-      question.correct_answers.destroy_all unless correct == question.correct_answers.map(&:give)
-      question.answers.destroy_all unless choice == question.answers.map(&:give)
-      choice.map {|x| question.answers.build(give: x)} if question.answers.empty?
-      correct.map {|p| question.correct_answers.build(give: p)} if question.correct_answers.empty?
-      question.update(multiple_answers: true) if question.correct_answers.size > 1
-      question.update(multiple_answers: false) if question.correct_answers.size == 1
-      question.save!
+
+  def update_transaction?(question_params)
+    transaction do
+      correct_answers.destroy_all unless correct == correct_answers.map(&:give)
+      answers.destroy_all unless choice == answers.map(&:give)
+      params_question_choice(question_params) if answers.empty?
+      params_correct_answer(question_params) if correct_answers.empty?
+      save!
     end
     rescue ActiveRecord::RecordInvalid 
   end
 
-  private
+  def params_question_choice(question_params)
+    question_params[:choice].split("\r\n").map(&:strip).reject(&:empty?).map {|x| self.answers.build(give: x)}
+  end
+
+  def params_correct_answer(question_params)
+    question_params[:correct].split("\r\n").map(&:strip).reject(&:empty?).map {|p| self.correct_answers.build(give: p)}
+  end
 
   def set_multiple_answers
-    self.update(multiple_answers: true) if self.correct_answers.size > 1
+    assign_attributes(multiple_answers: true) if correct_answers.size > 1
+    assign_attributes(multiple_answers: false) if correct_answers.size == 1
   end
 end
