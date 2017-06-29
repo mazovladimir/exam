@@ -2,14 +2,12 @@ class Question < ApplicationRecord
   attr_accessor :correct
   attr_accessor :choice
 
-  validate :validate_question, :validate_correct_answer, :validate_choice
+  validates :ask, uniqueness: { message: "Такой вопрос уже существует"}
+  validates :ask, length: { minimum: 5, maximum: 1000, message: "Пожалуйста, введите вопрос не меньше 5 и не более 1000 символов"}
+  validate :validate_correct, :validate_choice
 
-  def validate_question
-    self.errors.add(:base, "Пожалуйста, введите вопрос не меньше 1 символа") if self.ask.length < 1
-    self.errors.add(:base, "Пожалуйста, введите вопрос не больше 1000 символов") if self.ask.length > 1000
-  end
 
-  def validate_correct_answer
+  def validate_correct
     self.errors.add(:base, "Поле 'Правильный ответ' не может быть пустым") if self.correct_answers.size < 1
     self.errors.add(:base, "Не все правильные ответы входят в список вариантов ответа") if (self.correct_answers.map(&:give) - self.answers.map(&:give)).any?
     self.errors.add(:base, "Правильные ответы совпадают, удалите дубликаты") if self.correct_answers.map(&:give).uniq.size != self.correct_answers.map(&:give).size
@@ -29,22 +27,21 @@ class Question < ApplicationRecord
 
   def update_transaction?(question_params)
     transaction do
-      correct_answers.destroy_all unless correct == correct_answers.map(&:give)
-      answers.destroy_all unless choice == answers.map(&:give)
-      params_question_choice(question_params) if answers.empty?
-      params_correct_answer(question_params) if correct_answers.empty?
-      save!
+      assign_attributes(ask: question_params[:ask]) if question_params[:ask] != ask
+      correct_answers.destroy_all if question_params[:correct] != correct_answers.map(&:give)
+      answers.destroy_all if question_params[:choice] != answers.map(&:give)
+      params_correct_choice(question_params[:choice], answers) if answers.empty?
+      params_correct_choice(question_params[:correct], correct_answers) if correct_answers.empty?
+      update!(question_params)
     end
     rescue ActiveRecord::RecordInvalid 
   end
 
-  def params_question_choice(question_params)
-    question_params[:choice].split("\r\n").map(&:strip).reject(&:empty?).map {|x| self.answers.build(give: x)}
+  def params_correct_choice(question_params,question_method)
+    question_params.split("\r\n").map(&:strip).reject(&:empty?).map {|p| question_method.build(give: p)}
   end
 
-  def params_correct_answer(question_params)
-    question_params[:correct].split("\r\n").map(&:strip).reject(&:empty?).map {|p| self.correct_answers.build(give: p)}
-  end
+  private
 
   def set_multiple_answers
     assign_attributes(multiple_answers: true) if correct_answers.size > 1

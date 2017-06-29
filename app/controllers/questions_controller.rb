@@ -15,8 +15,8 @@ class QuestionsController < ApplicationController
 
   def create
     @question = Question.new(question_params)
-    @question.params_question_choice(question_params)
-    @question.params_correct_answer(question_params)
+    @question.params_correct_choice(question_params[:choice], @question.answers)
+    @question.params_correct_choice(question_params[:correct], @question.correct_answers)
 
     if @question.save
       redirect_to questions_path, notice: "Вопрос был успешно создан"
