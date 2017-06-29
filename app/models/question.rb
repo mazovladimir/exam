@@ -4,11 +4,12 @@ class Question < ApplicationRecord
 
   validates :ask, uniqueness: { message: "Такой вопрос уже существует"}
   validates :ask, length: { minimum: 5, maximum: 1000, message: "Пожалуйста, введите вопрос не меньше 5 и не более 1000 символов"}
+  validates :correct, presence: { message: "Поле 'Правильный ответ' не может быть пустым"}  
+
   validate :validate_correct, :validate_choice
 
 
   def validate_correct
-    self.errors.add(:base, "Поле 'Правильный ответ' не может быть пустым") if self.correct_answers.size < 1
     self.errors.add(:base, "Не все правильные ответы входят в список вариантов ответа") if (self.correct_answers.map(&:give) - self.answers.map(&:give)).any?
     self.errors.add(:base, "Правильные ответы совпадают, удалите дубликаты") if self.correct_answers.map(&:give).uniq.size != self.correct_answers.map(&:give).size
   end
@@ -27,7 +28,7 @@ class Question < ApplicationRecord
 
   def update_transaction?(question_params)
     transaction do
-      assign_attributes(ask: question_params[:ask]) if question_params[:ask] != ask
+      assign_attributes(ask: question_params[:ask])
       correct_answers.destroy_all if question_params[:correct] != correct_answers.map(&:give)
       answers.destroy_all if question_params[:choice] != answers.map(&:give)
       params_correct_choice(question_params[:choice], answers) if answers.empty?
