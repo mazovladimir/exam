@@ -49,6 +49,7 @@ group :development do
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'devise'
   gem "slim-rails"
+  gem 'record_tag_helper'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

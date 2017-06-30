@@ -1,19 +1,6 @@
 p= link_to 'Создать вопрос', new_question_path
 p= link_to 'Начать экзамен', user_questions_path(user_id: @user.id), method: :post
 
-- @questions.each_with_index do |question, index|
-  p= "-" * 200
-  p.question= "Вопрос №#{index+1}"
-  p.description= question.ask
-  b= "Правильный ответ:" 
-  - if ! question.nil?
-    - question.correct_answers.each do |correct_answer|
-      ul
-        li #{correct_answer.give}
-  b= "Варианты ответов:"
-  - question.answers.each do |qa|
-    ul
-      li #{qa.give}
-  p= link_to 'Редактировать вопрос', edit_question_path(question)
-  p= link_to 'Удалить вопрос', question_path(question),
-            data: {confirm: 'Вы уверены?'}, method: :delete 
+div class='myquestions'
+
+  = render @questions
