@@ -15,6 +15,7 @@ class QuestionsController < ApplicationController
 
   def create
     @question = Question.new(question_params)
+    @question.user = current_user
     @question.params_correct_choice(question_params[:choice], @question.answers)
     @question.params_correct_choice(question_params[:correct], @question.correct_answers)
 

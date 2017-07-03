@@ -21,10 +21,11 @@ class Question < ApplicationRecord
 
   before_save :set_multiple_answers
 
+  belongs_to :user
+
   has_many :answers, dependent: :destroy
-  has_many :questions_users
-  has_many :users, through: :questions_users
   has_many :correct_answers, dependent: :destroy
+
 
   def update_transaction?(question_params)
     transaction do
