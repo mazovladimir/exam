@@ -1,0 +1,18 @@
+= form_for @question do |question_form|
+  = render "errors"
+  
+  p= question_form.label :ask, 'Вопрос:'
+  p= question_form.text_area :ask, size: "100x6"
+
+  p= question_form.label :give, 'Правильный ответ:'
+  - @question.correct_answers.each do |correct_answer|
+    = question_form.fields_for correct_answer, index: correct_answer.id do |correct_answer_form|
+      p= correct_answer_form.text_field :give
+
+  p= question_form.label :give, 'Варианты ответов (каждый ответ в новой строке)'
+  - @question.answers.each do |answer|
+    = question_form.fields_for answer, index: answer.id do |answer_form|
+      p= answer_form.text_field :give
+
+  p
+  = question_form.submit @question.new_record? ? 'Сохранить' : 'Обновить'

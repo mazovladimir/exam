@@ -1,0 +1,7 @@
+= form_for :user, remote: true, html: {id: "question_#{question.id}"} do |f|
+  p= question.ask
+  - question.answers.each do |answer|
+    = radio_button_tag :answer, value: answer.give
+    = label :answer, answer.give
+  p= link_to "Prev Question", user_prev_question_path(id: question.id), remote: true if question != current_user.user_question_useranswers.map {|x| x.question}.first
+  p= link_to "Next Question", user_next_question_path(id: question.id), onclick:"$('question' + <%= @question.id %>).submit()", remote: true if question != current_user.user_question_useranswers.map {|x| x.question}.last

@@ -1,4 +1,0 @@
-= render "form.html.slim"
-p
-= link_to 'Предыдущий вопрос', user_prev_question_path(id: @examquestion.id), method: :get, remote: true
-= link_to 'Следующий вопрос', user_next_question_path(id: @examquestion.id), method: :get, remote: true

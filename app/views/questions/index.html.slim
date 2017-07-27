@@ -1,6 +1,5 @@
 p= link_to 'Создать вопрос', new_question_path
-p= link_to 'Начать экзамен', user_questions_path(user_id: @user.id), method: :post if user_signed_in?
+p= link_to 'Начать экзамен', user_exam_index_path(user_id: @user.id) if user_signed_in?
 
 div class='myquestions'
 
-  = render @user.questions

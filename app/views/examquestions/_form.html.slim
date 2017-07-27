@@ -1,4 +1,1 @@
-= form_for :user, method: :get, html: { class: "main-window" } do |f|
-  p= @examquestion.ask
-  - @examquestion.answers.each do |answer|
-    li= answer.give
+= render 'examquestions/question.html.slim', question: @question

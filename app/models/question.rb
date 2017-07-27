@@ -21,11 +21,14 @@ class Question < ApplicationRecord
 
   before_save :set_multiple_answers
 
-  belongs_to :user
-
   has_many :answers, dependent: :destroy
   has_many :correct_answers, dependent: :destroy
 
+  has_many :user_question_useranswers
+  has_many :users, through: :user_question_useranswers
+
+  has_many :user_question_useranswers
+  has_many :user_answers, through: :user_question_useranswers
 
   def update_transaction?(question_params)
     transaction do
@@ -42,6 +45,30 @@ class Question < ApplicationRecord
   def params_correct_choice(question_params,question_method)
     question_params.split("\r\n").map(&:strip).reject(&:empty?).map {|p| question_method.build(give: p)}
   end
+
+  def next
+    Question.where("id > ?", id).first
+  end
+
+  def prev
+    Question.where("id < ?", id).last
+  end
+
+#  def prev
+#    unless self.nil?
+#      index = Question.all.index(self)
+#      prev_id = Question.all[index-1] unless index == Question.all.index(Question.first)
+#      self.class.find_by_id(prev_id)
+#    end
+#  end
+#
+#  def next
+#    unless self.nil?
+#      index = Question.all.index(self)
+#      next_id = Question.all[index+1] unless index == Question.all.index(Question.last)
+#      self.class.find_by_id(next_id)
+#    end
+#  end
 
   private
 
