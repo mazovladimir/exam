@@ -6,8 +6,9 @@ Rails.application.routes.draw do
 
   resources :users do
     resources :exam, controller: "examquestions"
-    get "next_question", controller: "examquestions" 
-    get "prev_question", controller: "examquestions" 
+    #get "next_question", controller: "examquestions" 
+    #get "prev_question", controller: "examquestions" 
+    post "move_question", controller: "examquestions" 
   end
 
   resources :questions do

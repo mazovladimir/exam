@@ -1,18 +1,21 @@
 class ExamquestionsController < ApplicationController
-  before_action :set_examquestion, only: [ :next_question, :prev_question ]
+  before_action :set_examquestion, only: [ :move_question ]
 
   def index
-    Question.all.sample(5).map {|x| current_user.user_question_useranswers.create(question: x)} if current_user.user_question_useranswers.count < 5
-    @question = current_user.user_question_useranswers.map {|x| x.question}.first
-    @examquestion = @question
+    @examquestions = Question.all.sample(5)
+    if @examquestions.count == 5 
+      current_user.questions = @examquestions if current_user.questions.count < 5
+    else
+      flash.alert = "Questions not available, please contact course administrator"
+    end
+    @question = current_user.questions.first
   end
 
-  def next_question
-    @question = @examquestion.next
-  end
-
-  def prev_question
-    @question = @examquestion.prev
+  def move_question
+    @question = @examquestion.next(current_user) if params[:commit] == 'Next'
+    @question = @examquestion.prev(current_user) if params[:commit] == 'Prev'
+    current_index = current_user.questions.index(@examquestion)
+    current_user.user_question_useranswers[current_index].update(answer_user: params[:answer]) if ! params[:answer].nil?
   end
 
   private

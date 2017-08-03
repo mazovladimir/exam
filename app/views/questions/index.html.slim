@@ -1,5 +1,5 @@
 p= link_to 'Создать вопрос', new_question_path
-p= link_to 'Начать экзамен', user_exam_index_path(user_id: @user.id) if user_signed_in?
+p= link_to "#{current_user.questions.empty? ? 'Начать экзамен' : 'Продолжить экзамен' }", user_exam_index_path(user_id: @user.id) if user_signed_in?
 
 div class='myquestions'
 

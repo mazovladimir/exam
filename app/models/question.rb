@@ -46,29 +46,19 @@ class Question < ApplicationRecord
     question_params.split("\r\n").map(&:strip).reject(&:empty?).map {|p| question_method.build(give: p)}
   end
 
-  def next
-    Question.where("id > ?", id).first
+  def prev(user)
+    unless self.nil?
+      index = user.questions.index(self)
+      user.questions[index-1] if index > 0
+    end
   end
 
-  def prev
-    Question.where("id < ?", id).last
+  def next(user)
+    unless self.nil?
+      index = user.questions.index(self)
+      user.questions[index+1] if index < user.questions.count
+    end
   end
-
-#  def prev
-#    unless self.nil?
-#      index = Question.all.index(self)
-#      prev_id = Question.all[index-1] unless index == Question.all.index(Question.first)
-#      self.class.find_by_id(prev_id)
-#    end
-#  end
-#
-#  def next
-#    unless self.nil?
-#      index = Question.all.index(self)
-#      next_id = Question.all[index+1] unless index == Question.all.index(Question.last)
-#      self.class.find_by_id(next_id)
-#    end
-#  end
 
   private
 
