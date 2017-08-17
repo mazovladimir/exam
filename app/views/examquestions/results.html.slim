@@ -1,0 +1,12 @@
+table
+  thead
+    tr
+      th email
+      th User answer
+      th Score
+  tbody
+    - @users.each do |c|
+      tr
+        td = c.email
+        td = c.examinee_answer
+        td = c.examinee_score

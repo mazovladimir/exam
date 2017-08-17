@@ -2,12 +2,17 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-.question {
-  color: red;
+.question_number {
+  color: black;
+  font-weight: bold;
+  font-size: 18px;
+  text-align: center;
 }
 
 .description {
-  color: green;
+  color: red;
+  font-weight: bold;
+  font-size: 16px;
 }
 
 .notice {

@@ -1,0 +1,11 @@
+p= f.fields_for :answers do |answers_form|
+  p= answers_form.label :give, 'Ответ'
+  p= answers_form.text_area :give, size: "100x1"
+  p
+  = answers_form.check_box :correct_answer, { checked: answers_form.object.correct_answer? }
+  = answers_form.label :correct_answer, "Правильный ответ"
+  p
+  = answers_form.text_field :score
+  = answers_form.label :score, "Баллов за ответ"
+  p
+  = link_to "Delete answer", question_answer_path(@question, answers_form.object), method: :delete, remote: true if @question.answers.size > 2

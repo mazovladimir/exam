@@ -1,5 +1,5 @@
 class QuestionsController < ApplicationController
-  before_action :set_question, only: [ :edit, :update, :destroy ]
+  before_action :set_question, only: [ :show, :edit, :update, :destroy ]
 
   def index
     @questions = Question.all
@@ -8,16 +8,19 @@ class QuestionsController < ApplicationController
 
   def new
     @question = Question.new
+    2.times { @question.answers.build}
   end
 
   def edit
   end
 
+  def show
+  end
+
   def create
     @question = Question.new(question_params)
-    @question.user_question_useranswers.build(user_id: current_user.id)
-    @question.params_correct_choice(question_params[:choice], @question.answers)
-    @question.params_correct_choice(question_params[:correct], @question.correct_answers)
+    @question.user = current_user
+    params[:question][:answers_attributes].each { |key,value| value.correct_answer = true if value[:correct_answer] == 1 }
 
     if @question.save
       redirect_to questions_path, notice: "Вопрос был успешно создан"
@@ -27,7 +30,7 @@ class QuestionsController < ApplicationController
   end
 
   def update
-    if @question.update_transaction?(question_params)
+    if @question.update(question_params)
       redirect_to questions_path, notice: "Вопрос был успешно обновлен"
     else
       render 'edit'
@@ -35,8 +38,9 @@ class QuestionsController < ApplicationController
   end
 
   def destroy
-    @questions = Question.all
-    @question.destroy
+    if @question.destroy
+      redirect_to questions_path, notice: "Вопрос был успешно удален"
+    end
   end
 
   private
@@ -46,10 +50,6 @@ class QuestionsController < ApplicationController
   end
 
   def question_params
-    params.require(:question).permit(:ask, :correct, :choice)
-  end
-
-  def set_user
-    @user = User.find(params[:user_id])
+    params.require(:question).permit(:ask, answers_attributes: [:id, :give, :_destroy, :correct_answer, :score])
   end
 end

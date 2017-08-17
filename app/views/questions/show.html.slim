@@ -1,0 +1,8 @@
+p= "Question:"
+p= @question.ask
+p= "Answers:"
+- @question.answers.each do |answer|
+  ul
+    li
+      = answer.give
+p= link_to 'Edit', edit_question_path(@question)

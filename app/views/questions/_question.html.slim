@@ -1,15 +1,23 @@
-=div_for(question) do
-    p= "-" * 200
-    p= question.ask
-    b= "Правильный ответ:"
-    - if ! question.nil?
-      - question.correct_answers.each do |correct_answer|
-        ul
-          li #{correct_answer.give}
-    b= "Варианты ответов:"
-    - question.answers.each do |qa|
-      ul
-        li #{qa.give}
-    p= link_to 'Редактировать вопрос', edit_question_path(question)
-    p= link_to 'Удалить вопрос', question_path(question),
-            data: {confirm: 'Вы уверены?'}, method: :delete, remote: true
+= form_for question  do |f|
+  = render "errors"
+  
+  p= f.label :ask, 'Вопрос:'
+  p= f.text_area :ask, size: "100x6"
+
+  p= "Варианты ответов"
+
+  div class="answers"
+    p= f.fields_for :answers do |answers_form|
+      p= answers_form.label :give, 'Ответ'
+      p= answers_form.text_area :give, size: "100x1"
+      p
+      = answers_form.check_box :correct_answer, { checked: answers_form.object.correct_answer? }
+      = answers_form.label :correct_answer, "Правильный ответ"
+      p
+      = answers_form.text_field :score
+      = answers_form.label :score, "Баллов за ответ"
+      p
+      = link_to "Delete answer", question_answer_path(@question, answers_form.object), method: :delete, remote: true if @question.answers.size > 2
+
+  p= link_to "Добавить ответ", count_answer_path, remote: true
+  p= f.submit question.new_record? ? 'Сохранить' : 'Обновить'

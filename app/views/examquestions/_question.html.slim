@@ -1,15 +1,23 @@
 = div_for(question)
-  = form_tag(user_move_question_path, method: 'post', remote: true) do
-    p= "Вопрос №#{current_user.questions.index(question)+1}"
-    p= question.ask
+  = form_tag(user_check_question_path, method: 'post', remote: true, class: "question-form") do
+    p.question_number= "Вопрос #{current_user.questions.index(question)+1} / #{current_user.questions.count}"
+    p.description= question.ask
     br
-    - question.answers.each do |answer|
-      = radio_button_tag("answer_#{answer.id}", answer.give) 
-      = label_tag("answer_#{answer.id}", answer.give)
-      br
-      br
+    - if question.multiple_answers == false
+      - question.answers.each do |answer|
+        .answers
+          = radio_button_tag(:answer, answer.id) 
+          = label_tag(:answer, answer.give)
+          br
+          br
+    - else
+      .answers
+        = collection_check_boxes('', :answer, question.answers, :id, :give) do |b|
+          = b.label { b.check_box + b.text }
+          br
+          br
 
     = hidden_field_tag(:id, question.id)
 
-    p= submit_tag "Prev", remote: true if current_user.questions.index(question) > 0
-    p= submit_tag "Next", remote: true if current_user.questions.index(question) < current_user.questions.count - 1
+    p= submit_tag "Prev", name: "previous"
+    p= submit_tag "Next", name: "next"
